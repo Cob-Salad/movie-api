@@ -32,16 +32,30 @@ app.add_middleware(
 
 @app.get("/movies")
 async def get_movies() -> list[Movie]:
-    raise NotImplementedError
+    return movies
 
 @app.post("/movies")
 async def create_movie(new_movie: CreateMovieRequest) -> CreateMovieResponse:
-    raise NotImplementedError
+    movie_id = uuid.uuid4()
+    movies.append(new_movie)
+    return CreateMovieResponse(id=movie_id)
 
 @app.put("/movies/{movie_id}")
 async def update_movie(movie_id: uuid.UUID, updated_movie: UpdateMovieRequest) -> UpdateMovieResponse:
-    raise NotImplementedError
+    count = 0
+    for movie in movies:
+        if movie.movie_id == movie_id:
+            movies[count] = updated_movie
+            return UpdateMovieResponse(success=True)
+        count += 1
+    return UpdateMovieResponse(success=False)
 
 @app.delete("/movies/{movie_id}")
 async def delete_movie(movie_id: uuid.UUID) -> DeleteMovieResponse:
-    raise NotImplementedError
+    count = 0
+    for movie in movies:
+        if movie.movie_id == movie_id:
+            movies.pop(count)
+            return DeleteMovieResponse(success=True)
+        count += 1
+    return DeleteMovieResponse(success=False)
