@@ -8,10 +8,12 @@ class BaseMovie(BaseModel):
     year: int
 
 class CreateMovieRequest(BaseMovie):
-    pass
+    name:str
+    year:int
 
 class UpdateMovieRequest(BaseMovie):
-    pass
+    name:str
+    year:int
 
 class Movie(BaseMovie):
     movie_id: UUID

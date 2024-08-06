@@ -35,27 +35,47 @@ async def get_movies() -> list[Movie]:
     return movies
 
 @app.post("/movies")
-async def create_movie(new_movie: CreateMovieRequest) -> CreateMovieResponse:
+async def create_movie(movie_info: CreateMovieRequest) -> CreateMovieResponse:
     movie_id = uuid.uuid4()
+    new_movie = Movie(
+        name=movie_info.name,
+        year=movie_info.year,
+        movie_id=movie_id
+    )
+
     movies.append(new_movie)
     return CreateMovieResponse(id=movie_id)
 
 @app.put("/movies/{movie_id}")
 async def update_movie(movie_id: uuid.UUID, updated_movie: UpdateMovieRequest) -> UpdateMovieResponse:
-    count = 0
-    for movie in movies:
+    id_list = []
+    for i in movies:
+        id_list.append(i.movie_id)
+
+    if movie_id not in id_list:
+        return UpdateMovieResponse(success=False)
+
+
+    for index, movie in enumerate(movies):
         if movie.movie_id == movie_id:
-            movies[count] = updated_movie
+            movies[index] = Movie(
+                name=updated_movie.name,
+                year=updated_movie.year,
+                movie_id=movie_id
+            )
             return UpdateMovieResponse(success=True)
-        count += 1
-    return UpdateMovieResponse(success=False)
+    
 
 @app.delete("/movies/{movie_id}")
 async def delete_movie(movie_id: uuid.UUID) -> DeleteMovieResponse:
-    count = 0
-    for movie in movies:
+    id_list = []
+    for i in movies:
+        id_list.append(i.movie_id)
+
+    if movie_id not in id_list:
+        return DeleteMovieResponse(success=False)
+    
+    for index, movie in enumerate(movies):
         if movie.movie_id == movie_id:
-            movies.pop(count)
+            movies.pop(index)
             return DeleteMovieResponse(success=True)
-        count += 1
-    return DeleteMovieResponse(success=False)
